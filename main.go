@@ -71,6 +71,19 @@ var futharkMap = map[string]string{
 	"ij": ehwaz,
 	"cc": kaunan + sowilo,
 
+	"th":  thurisaz,
+	"eau": othala,
+	"chr": hagalaz + raido,
+	"ing": ingwaz,
+	"chl": hagalaz + laguz,
+	"ng":  ingwaz,
+	"chj": hagalaz + jera,
+	"nk":  ingwaz + kaunan,
+	"chw": hagalaz + wunjo,
+	"ei":  sowilo,
+	"ø":   othala + ehwaz,
+	"å":   ansuz + ansuz,
+
 	"q": kaunan,
 }
 
