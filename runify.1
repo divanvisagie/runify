@@ -1,0 +1,23 @@
+.\" Manpage for runify
+.TH man 1 "30 April 2018" "0.0.4" "runify man page"
+.SH NAME
+runify - convert latin alphabet characters to Elder Futhark runes
+.SH SYNOPSIS
+cat [FILE] | runify
+ifconfig | runify
+.SH DESCRIPTION
+runify is designed to have data piped through it, it currently does
+not receive files itself but there are plans in the future for it to do so.
+
+When runify runs into characters that are not inherently part of the Elder Futhark
+it will make the decision as to how to most appropriately replace the character.
+
+For example: "x" becomes "ᚲᛋ" because it sounds like cs or ks
+.SH COPYRIGHT
+Copyright © 2017 Divan Visagie.   License  GPLv3+:  GNU
+GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This  is  free  software:  you  are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.SH AUTHOR
+Divan Visagie (me@dvisagie.com)
+

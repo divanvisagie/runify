@@ -12,3 +12,8 @@ archive:
   format_overrides:
     - goos: windows
       format: zip
+
+
+files:
+    - install.sh
+    - runify.1
