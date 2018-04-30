@@ -2,18 +2,12 @@ builds:
   - main: main.go
   - binary: runify
     goos:
-      - windows
       - darwin
       - linux
     goarch:
       - amd64
 
 archive:
-  format_overrides:
-    - goos: windows
-      format: zip
-
-
   files:
     - install.sh
     - runify.1
