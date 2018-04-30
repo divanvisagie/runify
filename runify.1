@@ -1,13 +1,18 @@
 .\" Manpage for runify
-.TH man 1 "30 April 2018" "0.0.7" "runify man page"
+.TH man 1 "30 April 2018" "0.0.8" "runify man page"
 .SH NAME
 runify - convert latin alphabet characters to Elder Futhark runes
 .SH SYNOPSIS
+runify
+
+runify [FILE]
+
 cat [FILE] | runify
+
 ifconfig | runify
 .SH DESCRIPTION
-runify is designed to have data piped through it, it currently does
-not receive files itself but there are plans in the future for it to do so.
+runify is designed to have data piped through it, to read from a file, or to function 
+as a REPL (Read–Eval–Print Loop)
 
 When runify runs into characters that are not inherently part of the Elder Futhark
 it will make the decision as to how to most appropriately replace the character.

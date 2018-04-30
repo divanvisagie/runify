@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -44,7 +45,27 @@ func translate(inputString string) string {
 	return result
 }
 
+func translateFile(filename string) {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println("Can't read file:", filename)
+		panic(err)
+	}
+
+	toConvert := string(data)
+
+	var translated = translate(toConvert)
+	fmt.Println(translated)
+}
+
 func main() {
+
+	if len(os.Args) == 2 {
+		filename := os.Args[1]
+		translateFile(filename)
+		return
+	}
+
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		var toConvert = scanner.Text()
