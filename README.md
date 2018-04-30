@@ -13,7 +13,25 @@ You can even pipe it through lolcat for color
 
 # Installation
 
+### From Binary
+
+Download Latest Binary for your platform [here](https://github.com/divanvisagie/runify/releases)
+
+#### Unix/Linux
+Run install.sh, if you have trouble first run `chmod +x install.sh`
+
+#### Windows
+Put it in the directory where your other command files live or whatever else you freedom haters do to get commands working on that system.
+
+### From Source
+
 ```bash
 go build
-sudo cp runify /usr/local/bin
+sudo ./install.sh
 ```
+
+If you have issues run `chmod +x install.sh` first
+
+
+
+
