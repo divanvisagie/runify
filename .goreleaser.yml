@@ -14,6 +14,6 @@ archive:
       format: zip
 
 
-files:
-  - install.sh
-  - runify.1
+  files:
+    - install.sh
+    - runify.1
