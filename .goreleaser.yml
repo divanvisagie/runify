@@ -15,5 +15,5 @@ archive:
 
 
 files:
-    - install.sh
-    - runify.1
+  - install.sh
+  - runify.1
