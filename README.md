@@ -15,4 +15,13 @@ You can even pipe it through lolcat for color
 
 Download Latest Binary for your platform [here](https://github.com/divanvisagie/runify/releases)
 
+### Install via homebrew 
+If you don't have the tap, add it with: 
+```sh 
+brew tap divanvisagie/homebrew-tap 
+```
 
+Then simply
+```sh
+brew install runify
+```
