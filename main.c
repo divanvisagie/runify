@@ -1,8 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "default.h"
+
+typedef struct {
+  bool help;
+  bool list;
+  char* system;
+} Args;
+
+Args* parse_args(int argc, char **argv) {
+  Args *args = malloc(sizeof(Args));
+  args->help = false;
+  args->list = false;
+  args->system = "younger";
+
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+      args->help = true;
+    }
+    if (strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--list") == 0) {
+      args->list = true;
+    }
+
+    // look for system={{system}}
+    if (strstr(argv[i], "system=") != NULL) {
+      char *system = strtok(argv[i], "=");
+      system = strtok(NULL, "=");
+      args->system = system;
+    }
+    if (strcmp(argv[i], "-s") == 0) {
+      args->system = argv[i + 1];
+    }
+  }
+  return args;
+}
 
 char* get_help() {
   char* help = "Usage: runify [OPTION]... [STRING]\n"
@@ -27,25 +61,18 @@ char* list_rune_systems() {
 
 int main(int argc, char **argv) {
   // if arg is for help
-  if (argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
+  Args *args = parse_args(argc, argv);
+  if (args->help) {
     char *help = get_help();
     printf("%s\n", help);
     return 0;
   }
 
   //if list
-  if (argc == 2 && (strcmp(argv[1], "-l") == 0 || strcmp(argv[1], "--list") == 0)) {
+  if (args->list) {
     char *systems = list_rune_systems();
     printf("%s\n", systems);
     return 0;
-  }
-
-  //get the system flag value if it exists or set the default
-  char *system = "elder";
-  for (int i = 1; i < argc; i++) {
-    if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--system") == 0) {
-      system = argv[i + 1];
-    }
   }
 
   char *input = "No input was provided";
@@ -65,7 +92,7 @@ int main(int argc, char **argv) {
   input[strcspn(input, "\n")] = 0;
 
   TokenMapper *mapper = token_mapper_elder_new();
-  if (strcmp(system, "younger") == 0) {
+  if (strcmp(args->system, "younger") == 0) {
     mapper = token_mapper_younger_new();
   }
 
