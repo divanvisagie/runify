@@ -28,7 +28,6 @@ char* list_rune_systems() {
 }
 
 int main(int argc, char **argv) {
-  // if arg is for help
   Args *args = parse_args(argc, argv);
   if (args->help) {
     char *help = get_help();
@@ -36,7 +35,6 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  //if list
   if (args->list) {
     char *systems = list_rune_systems();
     printf("%s\n", systems);
