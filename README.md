@@ -1,7 +1,5 @@
 # ᚱᚢᚾᛁᚠᛃ (runify)
 
-[![Build Status](https://travis-ci.org/divanvisagie/runify.svg?branch=master)](https://travis-ci.org/divanvisagie/runify)
-
 ## Description
 
 Converts text piped in from stdin into a futhark of your choise using mappings
