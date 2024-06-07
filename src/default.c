@@ -53,7 +53,7 @@ char *to_fut(TokenMapper *map, char *input) {
   int token_index = 0;
   char *token = malloc(len + 1);
 
-  while (*p != '\0') {
+  do {
     if (*p == ' ') {
       strcat(fut_str, " ");
       continue;
@@ -73,15 +73,19 @@ char *to_fut(TokenMapper *map, char *input) {
     token_next[token_index + 1] = '\0';
 
     // if the token does not exist in the map
-    if (g_hash_table_contains(map->map, token) &&
-        !g_hash_table_contains(map->map, token_next)) {
+    if ((g_hash_table_contains(map->map, token) &&
+         !g_hash_table_contains(map->map, token_next)) ||
+        // if the token and next token are the same, we have hit the end of the
+        // input string
+        (strcmp(token, token_next) == 0)
+    ) {
       char *futhark = g_hash_table_lookup(map->map, token);
       strcat(fut_str, futhark);
       token[token_index] = '\0';
       token[0] = '\0';
       token_index = 0;
     }
-  }
+  } while (*p != '\0');
 
   return fut_str;
 }
