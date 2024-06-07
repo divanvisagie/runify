@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
   }
 
   // Print and free resources
-  printf("%s\n", output);
+  printf("%s", output);
   free(output);
   free(mapper);
   free(all_input);
