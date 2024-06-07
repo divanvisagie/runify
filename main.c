@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Error transliterating input\n");
     return 1;
   }
-  printf("%s\n", output);
+  printf("%s", output);
 
   free(output);
   free(mapper);
