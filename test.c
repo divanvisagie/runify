@@ -25,8 +25,8 @@ static void test_to_elder_futhark(void **state) {
 static void test_non_supported_token(void **state) {
   TokenMapper* tokenMapper = token_mapper_elder_new();
   assert_non_null(tokenMapper);
-  char* actual = to_fut(tokenMapper, "futhark!");
-  assert_string_equal("ᚠᚢᚦᚨᚱᚲ!", actual);
+  char* actual = to_fut(tokenMapper, "futhark!\n");
+  assert_string_equal("ᚠᚢᚦᚨᚱᚲ!\n", actual);
   
   free(tokenMapper);
 }
