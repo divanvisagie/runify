@@ -17,7 +17,10 @@ SOURCES := $(filter-out $(EXCLUDES), $(SOURCES))
 $(shell mkdir -p $(BIN_DIR))
 
 main:
-	$(CC) $(CFLAGS) main.c $(SOURCES) -o $(BIN_DIR)/$(BIN_NAME) $(LDFLAGS)
+	$(CC) $(CFLAGS) main.c $(SOURCES) -o $(BIN_DIR)/$(BIN_NAME) -g $(LDFLAGS)
+
+run: main
+	./$(BIN_DIR)/$(BIN_NAME)
 
 test:
 	$(CC) $(CFLAGS) test.c $(SOURCES) -o $(BIN_DIR)/$@ -g $(LDFLAGS)
