@@ -53,11 +53,7 @@ char *to_fut(TokenMapper *map, char *str) {
   int token_index = 0;
   char *token = malloc(len + 1);
 
-  do {
-    if (*p == '\0') {
-      strcat(fut_str, "\0");
-      return fut_str;
-    }
+  while (*p != '\0') {
     if (*p == ' ') {
       strcat(fut_str, " ");
     } else {
@@ -86,7 +82,7 @@ char *to_fut(TokenMapper *map, char *str) {
     }
     p++;
     token_index++;
-  } while (*p != '\0');
+  }
 
   return fut_str;
 }
