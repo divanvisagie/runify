@@ -56,6 +56,9 @@ char *to_fut(TokenMapper *map, char *input) {
   do {
     if (*p == ' ') {
       strcat(fut_str, " ");
+      token[0] = '\0';
+      token_index = 0;
+      p++;
       continue;
     }
 

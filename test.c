@@ -15,6 +15,9 @@ static void test_to_futhark(void **state) {
   assert_non_null(tokenMapper);
   char* actual = to_fut(tokenMapper, "futhark");
   assert_string_equal("ᚠᚢᚦᚨᚱᚲ", actual);
+
+  char* actual2 = to_fut(tokenMapper, "hello world");
+  assert_string_equal("ᚺᛖᛚᛚᛟ ᚹᛟᚱᛚᛞ", actual2);
   
   free(tokenMapper);
 }
