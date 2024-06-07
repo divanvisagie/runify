@@ -96,6 +96,16 @@ char *to_fut(TokenMapper *map, char *input) {
     token[token_index] = c;
     token[token_index + 1] = '\0';
 
+    //if the char is not in the map at all, we dump it and
+    //just use the char that is there
+    if (!g_hash_table_contains(map->map, token)) {
+      strcat(fut_str, token);
+      token[0] = '\0';
+      token_index = 0;
+      p++;
+      continue;
+    }
+
     p++;
     token_index++;
 
@@ -105,7 +115,6 @@ char *to_fut(TokenMapper *map, char *input) {
     token_next[token_index] = tolower(*p);
     token_next[token_index + 1] = '\0';
 
-    // if the token does not exist in the map
     if ((g_hash_table_contains(map->map, token) &&
          !g_hash_table_contains(map->map, token_next)) ||
         // if the token and next token are the same, we have hit the end of the
