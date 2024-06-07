@@ -55,10 +55,13 @@ deb-publish:
 tarball: build
 	@echo "Packaging the release..."
 	@mkdir -p $(RELEASE_DIR);
-	@cp docs/$(BIN_NAME).1 bin/$(BIN_NAME);
+	@cp docs/$(BIN_NAME).1 bin/;
 	@tar -czf $(RELEASE_DIR)/$(BIN_NAME)-$(PLATFORM)-$(ARCH).tar.gz -C bin/ $(BIN_NAME);
 
 tarball-publish: tarball
 	@TARBALL=$(BIN_NAME)-$(PLATFORM)-$(ARCH).tar.gz; \
 	echo "Sending tarball $$TARBALL to script"; \
 	sh ./scripts/publish_asset.sh $$TARBALL
+
+homebrew:
+	@sh ./scripts/homebrew.sh
