@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
   printf("trimmed input was: '%s'\n", input);
 
   // create a new TokenMapper
-  TokenMapper *mapper = token_mapper_new();
+  TokenMapper *mapper = token_mapper_elder_new();
   if (!mapper) {
     fprintf(stderr, "Error creating TokenMapper\n");
     return 1;

@@ -12,13 +12,20 @@ const char *latinTokens[] = {
     "b",  "e",   "m",  "l",  "ŋ",   "o",   "d",   "v",   "ð",  "x",
     "ch", "ij",  "cc", "th", "eau", "chr", "ing", "chl", "ng", "chj",
     "nk", "chw", "ei", "ø",  "å",   "q",   NULL};
+
 const char *elderFutharkTokens[] = {
     "ᚠ", "ᚢ",  "ᚦ", "ᚨ",  "ᚱ",  "ᚲ",  "ᚲ", "ᚷ",  "ᚹ",  "ᚺ", "ᚾ", "ᛁ",
     "ᛃ", "ᛃ",  "ᛇ", "ᛇ",  "ᛈ",  "ᛉ",  "ᛋ", "ᛏ",  "ᛒ",  "ᛖ", "ᛗ", "ᛚ",
     "ᛜ", "ᛟ",  "ᛞ", "ᚠ",  "ᚦ",  "ᚲᛋ", "ᚷ", "ᛖ",  "ᚲᛋ", "ᚦ", "ᛟ", "ᚺᚱ",
     "ᛜ", "ᚺᛚ", "ᛜ", "ᚺᛃ", "ᛜᚲ", "ᚺᚹ", "ᛋ", "ᛟᛖ", "ᚨᚨ", "ᚲ", NULL};
 
-TokenMapper *token_mapper_new() {
+const char *youngerFutarkTokens[] = {
+    "ᚠ", "ᚢ",  "ᚦ", "ᛅ",  "ᚱ",  "ᚴ",  "ᚵ", "ᚷ",  "ᚹ",  "ᚺ", "ᚾ", "ᛁ",
+    "ᛡ", "ᛡ",  "ᛇ", "ᛇ",  "ᛈ",  "ᛉ",  "ᛋ", "ᛏ",  "ᛒ",  "ᛖ", "ᛗ", "ᛚ",
+    "ᛜ", "ᛟ",  "ᛞ", "ᚠ",  "ᚦ",  "ᚴᛋ", "ᚷ", "ᛖ",  "ᚴᛋ", "ᚦ", "ᛟ", "ᚺᚱ",
+    "ᛜ", "ᚺᛚ", "ᛜ", "ᚺᛡ", "ᛜᚴ", "ᚺᚹ", "ᛋ", "ᛟᛖ", "ᚭᚭ", "ᚴ", NULL};
+
+TokenMapper *token_mapper_elder_new() {
   GHashTable *latinToFutharkMap;
 
   latinToFutharkMap = g_hash_table_new(g_str_hash, g_str_equal);
@@ -29,6 +36,29 @@ TokenMapper *token_mapper_new() {
   for (int i = 0; latinTokens[i] != NULL; i++) {
     g_hash_table_insert(latinToFutharkMap, (gpointer)latinTokens[i],
                         (gpointer)elderFutharkTokens[i]);
+  }
+
+  TokenMapper *tokenMapper = malloc(sizeof(TokenMapper));
+  if (!tokenMapper) {
+    // Handle error if memory allocation fails
+    g_hash_table_destroy(latinToFutharkMap);
+    return NULL;
+  }
+  tokenMapper->map = latinToFutharkMap;
+  return tokenMapper;
+}
+
+TokenMapper *token_mapper_younger_new() {
+  GHashTable *latinToFutharkMap;
+
+  latinToFutharkMap = g_hash_table_new(g_str_hash, g_str_equal);
+  if (!latinToFutharkMap) {
+    return NULL;
+  }
+
+  for (int i = 0; latinTokens[i] != NULL; i++) {
+    g_hash_table_insert(latinToFutharkMap, (gpointer)latinTokens[i],
+                        (gpointer)youngerFutarkTokens[i]);
   }
 
   TokenMapper *tokenMapper = malloc(sizeof(TokenMapper));

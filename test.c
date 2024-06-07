@@ -10,8 +10,8 @@
 
 #include "default.h"
 
-static void test_to_futhark(void **state) {
-  TokenMapper* tokenMapper = token_mapper_new();
+static void test_to_elder_futhark(void **state) {
+  TokenMapper* tokenMapper = token_mapper_elder_new();
   assert_non_null(tokenMapper);
   char* actual = to_fut(tokenMapper, "futhark");
   assert_string_equal("ᚠᚢᚦᚨᚱᚲ", actual);
@@ -22,8 +22,17 @@ static void test_to_futhark(void **state) {
   free(tokenMapper);
 }
 
+static void test_to_younger_futhark(void **state) {
+  TokenMapper* tokenMapper = token_mapper_younger_new();
+  assert_non_null(tokenMapper);
+  char* actual = to_fut(tokenMapper, "aifur");
+  assert_string_equal("ᛅᛁᚠᚢᚱ", actual);
+  
+  free(tokenMapper);
+}
+
 static void test_map_loaded_correctly(void **state) {
-  TokenMapper* tokenMapper = token_mapper_new();
+  TokenMapper* tokenMapper = token_mapper_elder_new();
   assert_non_null(tokenMapper);
   
   assert_non_null(tokenMapper->map);
@@ -37,7 +46,8 @@ static void test_map_loaded_correctly(void **state) {
 int main(int argc, char *argv[]) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(test_map_loaded_correctly),
-      cmocka_unit_test(test_to_futhark),
+      cmocka_unit_test(test_to_younger_futhark),
+      cmocka_unit_test(test_to_elder_futhark),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
