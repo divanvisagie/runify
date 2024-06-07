@@ -75,13 +75,20 @@ TokenMapper *token_mapper_younger_new() {
  * Elder Futhark characters. */
 char *to_fut(TokenMapper *map, char *input) {
   size_t len = strlen(input);
-  char *fut_str =
-      malloc(len * 2 + 1); // Allocate more space for potential expansions
-  fut_str[0] = '\0';       // Initialize to an empty string
+  char *fut_str = malloc((len * 4) + 1); // 4 because of utf8 expansion
+  if (!fut_str) {
+    perror("Error allocating memory for output string");
+    return NULL;
+  }
+  fut_str[0] = '\0';
 
   char *p = input;
   int token_index = 0;
   char *token = malloc(len + 1);
+  if (!token) {
+    perror("Error allocating memory for token");
+    return NULL;
+  }
 
   do {
     if (*p == ' ') {
@@ -96,8 +103,8 @@ char *to_fut(TokenMapper *map, char *input) {
     token[token_index] = c;
     token[token_index + 1] = '\0';
 
-    //if the char is not in the map at all, we dump it and
-    //just use the char that is there
+    // if the char is not in the map at all, we dump it and
+    // just use the char that is there
     if (!g_hash_table_contains(map->map, token)) {
       strcat(fut_str, token);
       token[0] = '\0';
@@ -119,8 +126,7 @@ char *to_fut(TokenMapper *map, char *input) {
          !g_hash_table_contains(map->map, token_next)) ||
         // if the token and next token are the same, we have hit the end of the
         // input string
-        (strcmp(token, token_next) == 0)
-    ) {
+        (strcmp(token, token_next) == 0)) {
       char *futhark = g_hash_table_lookup(map->map, token);
       strcat(fut_str, futhark);
       token[token_index] = '\0';
@@ -128,6 +134,7 @@ char *to_fut(TokenMapper *map, char *input) {
       token_index = 0;
     }
   } while (*p != '\0');
-
+  
+  free(token);
   return fut_str;
 }
