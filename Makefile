@@ -65,3 +65,7 @@ tarball-publish: tarball
 
 homebrew:
 	@sh ./scripts/homebrew.sh
+
+scan:
+	# valgrind --leak-check=yes --track-origins=yes ./bin/test
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./bin/test

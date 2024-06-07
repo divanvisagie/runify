@@ -1,14 +1,17 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
-#include "default.h"
 #include "args.h"
+#include "default.h"
 
-char* get_help() {
-  char* help = "Usage: runify [OPTION]... [STRING]\n"
-               "Transliterate a string from Latin characters to Elder Futhark characters.\n"
+#define INITIAL_BUFFER_SIZE 1024
+
+char *get_help() {
+  char *help = "Usage: runify [OPTION]... [STRING]\n"
+               "Transliterate a string from Latin characters to Elder Futhark "
+               "characters.\n"
                "\n"
                "Options:\n"
                "  -h, --help              Display this help and exit\n"
@@ -21,8 +24,8 @@ char* get_help() {
   return help;
 }
 
-char* list_rune_systems() {
-  char* systems = "elder:   Elder Futhark\n"
+char *list_rune_systems() {
+  char *systems = "elder:   Elder Futhark\n"
                   "younger: Younger Futhark\n";
   return systems;
 }
@@ -41,39 +44,61 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  char *input = "No input was provided";
+  size_t buffer_size = INITIAL_BUFFER_SIZE;
+  char *all_input = malloc(buffer_size);
+  if (!all_input) {
+    perror("malloc");
+    return 1;
+  }
+  all_input[0] = '\0'; // Initialize empty string
+
   size_t len = 0;
   ssize_t read;
+  char *line = NULL;
 
-  char all_input[1000];
-  // TODO: if you for example pipe ls in, this will only get the first item
-  // so we need some better input handling here
-  // Read lines from stdin until EOF
-  while ((read = getline(&input, &len, stdin)) != -1) {
-    size_t input_len = strlen(input);
-    strncat(all_input, input, input_len);
+  while ((read = getline(&line, &len, stdin)) != -1) {
+    size_t current_len = strlen(all_input);
+    size_t total_len = current_len + read;
+    if (total_len >= buffer_size) {
+      buffer_size *= 2;
+      all_input = realloc(all_input, buffer_size);
+      if (!all_input) {
+        perror("realloc");
+        free(line);
+        return 1;
+      }
+    }
+    strncat(all_input, line, read);
   }
 
-  // trim last newline from input
-  input[strcspn(input, "\n")] = 0;
-
+  free(line);
+  // Select the rune system
   TokenMapper *mapper = token_mapper_elder_new();
   if (strcmp(args->system, "younger") == 0) {
     mapper = token_mapper_younger_new();
   }
 
+  // Map and transliterate input
   if (!mapper) {
     fprintf(stderr, "Error creating TokenMapper\n");
+    free(all_input);
     return 1;
   }
+
   char *output = to_fut(mapper, all_input);
+
   if (!output) {
     fprintf(stderr, "Error transliterating input\n");
+    free(all_input);
+    free(mapper);
     return 1;
   }
-  printf("%s", output);
 
+  // Print and free resources
+  printf("%s\n", output);
   free(output);
   free(mapper);
-}
+  free(all_input);
 
+  return 0;
+}
