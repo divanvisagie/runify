@@ -24,5 +24,5 @@ test:
 	./$(BIN_DIR)/$@
 
 clean:
-	rm -f bin/main
+	rm -f bin/$(BIN_NAME)
 	rm -f bin/test

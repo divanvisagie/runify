@@ -43,45 +43,44 @@ TokenMapper *token_mapper_new() {
 
 /* This function is used to transliterate a string from Latin characters to
  * Elder Futhark characters. */
-char *to_fut(TokenMapper *map, char *str) {
-  size_t len = strlen(str);
+char *to_fut(TokenMapper *map, char *input) {
+  size_t len = strlen(input);
   char *fut_str =
       malloc(len * 2 + 1); // Allocate more space for potential expansions
   fut_str[0] = '\0';       // Initialize to an empty string
 
-  char *p = str;
+  char *p = input;
   int token_index = 0;
   char *token = malloc(len + 1);
 
   while (*p != '\0') {
     if (*p == ' ') {
       strcat(fut_str, " ");
-    } else {
-      if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z')) {
-        char c = tolower(*p);
-        token[token_index] = c;
-        token[token_index + 1] = '\0';
-
-        if (g_hash_table_contains(map->map, token)) {
-          const char *futhark = g_hash_table_lookup(map->map, token);
-          size_t len = strlen(futhark);
-          strncat(fut_str, futhark, len);
-
-          token_index = -1;
-          token[0] = '\0';
-        }
-      } else {
-        // if the current character is not a letter, add the character to the
-        // futhark string
-        strncat(fut_str, p, 1);
-
-        // reset token
-        token_index = 0;
-        token[0] = '\0';
-      }
+      continue;
     }
+
+    char c = tolower(*p);
+    token[token_index] = c;
+    token[token_index + 1] = '\0';
+
     p++;
     token_index++;
+
+    // token next is the token plus one extra char
+    char *token_next = malloc(len + 1);
+    strcpy(token_next, token);
+    token_next[token_index] = tolower(*p);
+    token_next[token_index + 1] = '\0';
+
+    // if the token does not exist in the map
+    if (g_hash_table_lookup(map->map, token) != NULL &&
+        g_hash_table_lookup(map->map, token_next) == NULL) {
+      char* futhark = g_hash_table_lookup(map->map, token);
+      strcat(fut_str, futhark);
+      token[token_index] = '\0';
+      token[0] = '\0';
+      token_index = 0;
+    }
   }
 
   return fut_str;
