@@ -77,6 +77,5 @@ int main(int argc, char **argv) {
 
   free(output);
   free(mapper);
-
 }
 
