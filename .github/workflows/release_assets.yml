@@ -30,7 +30,7 @@ jobs:
       - name: Add dependencies
         run: |
           brew install cmocka
-          brew install glibc
+          brew install glib
 
       - name: Build the project
         run: make build TARGET=${{ env.TARGET }}
