@@ -73,9 +73,9 @@ char *to_fut(TokenMapper *map, char *input) {
     token_next[token_index + 1] = '\0';
 
     // if the token does not exist in the map
-    if (g_hash_table_lookup(map->map, token) != NULL &&
-        g_hash_table_lookup(map->map, token_next) == NULL) {
-      char* futhark = g_hash_table_lookup(map->map, token);
+    if (g_hash_table_contains(map->map, token) &&
+        !g_hash_table_contains(map->map, token_next)) {
+      char *futhark = g_hash_table_lookup(map->map, token);
       strcat(fut_str, futhark);
       token[token_index] = '\0';
       token[0] = '\0';
