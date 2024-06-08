@@ -102,6 +102,11 @@ static int compare_strings_by_length(const void *a, const void *b) {
 char *to_fut(TokenMapper *map, const char *input) {
   char *output = malloc(strlen(input) * 4);
   strcpy(output, input);
+  
+  // we lowercase the output string since it needs to map against lower case keys
+  for (size_t i = 0; i < strlen(output); i++) {
+    output[i] = tolower(output[i]);
+  }
 
   KVP *kvps = malloc(sizeof(KVP) * g_hash_table_size(map->map));
   size_t kvp_count = 0;
