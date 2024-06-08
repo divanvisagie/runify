@@ -2,7 +2,11 @@
 
 ## Description
 
-Converts text piped in from stdin into a futhark of your choise using mappings
+Converts text piped in from stdin into a futhark of your choice using mappings
+
+** Note on current state of accuracy **
+Currently the mappings are not fully tested or compared against historical
+findings, this is is a work in progress until 1.O is released.
 
 ![ScreenShot 1](docs/1.png)
 
