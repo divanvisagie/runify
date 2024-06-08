@@ -6,135 +6,126 @@
 
 #include "default.h"
 
-const char *latin_tokens[] = {
-    "f",  "u",   "þ",  "a",  "r",   "k",   "c",   "g",   "w",  "h",
-    "n",  "i",   "j",  "y",  "æ",   "ï",   "p",   "z",   "s",  "t",
-    "b",  "e",   "m",  "l",  "ŋ",   "o",   "d",   "v",   "ð",  "x",
-    "ch", "ij",  "cc", "th", "eau", "chr", "ing", "chl", "ng", "chj",
-    "nk", "chw", "ei", "ø",  "å",   "q",   NULL};
+typedef struct {
+  const char *latin;
+  const char *futhark;
+} TokenPair;
 
-const char *elder_futhark_tokens[] = {
-    "ᚠ", "ᚢ",  "ᚦ", "ᚨ",  "ᚱ",  "ᚲ",  "ᚲ", "ᚷ",  "ᚹ",  "ᚺ", "ᚾ", "ᛁ",
-    "ᛃ", "ᛃ",  "ᛇ", "ᛇ",  "ᛈ",  "ᛉ",  "ᛋ", "ᛏ",  "ᛒ",  "ᛖ", "ᛗ", "ᛚ",
-    "ᛜ", "ᛟ",  "ᛞ", "ᚠ",  "ᚦ",  "ᚲᛋ", "ᚷ", "ᛖ",  "ᚲᛋ", "ᚦ", "ᛟ", "ᚺᚱ",
-    "ᛜ", "ᚺᛚ", "ᛜ", "ᚺᛃ", "ᛜᚲ", "ᚺᚹ", "ᛋ", "ᛟᛖ", "ᚨᚨ", "ᚲ", NULL};
+const TokenPair elder_futhark_pairs[] = {
+    {"a", "ᚨ"},    {"b", "ᛒ"},    {"c", "ᚲ"},  {"d", "ᛞ"},    {"e", "ᛖ"},
+    {"f", "ᚠ"},    {"g", "ᚷ"},    {"h", "ᚺ"},  {"i", "ᛁ"},    {"j", "ᛃ"},
+    {"k", "ᚲ"},    {"l", "ᛚ"},    {"m", "ᛗ"},  {"n", "ᚾ"},    {"o", "ᛟ"},
+    {"p", "ᛈ"},    {"r", "ᚱ"},    {"s", "ᛋ"},  {"t", "ᛏ"},    {"u", "ᚢ"},
+    {"v", "ᚠ"},    {"w", "ᚹ"},    {"y", "ᛃ"},  {"z", "ᛉ"},    {"æ", "ᛇ"},
+    {"þ", "ᚦ"},    {"ð", "ᚦ"},    {"ŋ", "ᛜ"},  {"x", "ᚲᛋ"},   {"ch", "ᚷ"},
+    {"ij", "ᛖ"},   {"cc", "ᚲᛋ"},  {"th", "ᚦ"}, {"eau", "ᛟ"},  {"chr", "ᚺᚱ"},
+    {"ing", "ᛜ"},  {"chl", "ᚺᛚ"}, {"ng", "ᛜ"}, {"chj", "ᚺᛃ"}, {"nk", "ᛜᚲ"},
+    {"chw", "ᚺᚹ"}, {"ei", "ᛋ"},   {"ø", "ᛟᛖ"}, {"å", "ᚨᚨ"},   {"q", "ᚲ"},
+    {"ï", "ᛇ"},    {NULL, NULL}};
 
-const char *younger_futhark_tokens[] = {
-    "ᚠ", "ᚢ",  "ᚦ", "ᛅ",  "ᚱ",  "ᚴ",  "ᚵ", "ᚷ",  "ᚹ",  "ᚺ", "ᚾ", "ᛁ",
-    "ᛡ", "ᛡ",  "ᛇ", "ᛇ",  "ᛈ",  "ᛉ",  "ᛋ", "ᛏ",  "ᛒ",  "ᛖ", "ᛗ", "ᛚ",
-    "ᛜ", "ᛟ",  "ᛞ", "ᚠ",  "ᚦ",  "ᚴᛋ", "ᚷ", "ᛖ",  "ᚴᛋ", "ᚦ", "ᛟ", "ᚺᚱ",
-    "ᛜ", "ᚺᛚ", "ᛜ", "ᚺᛡ", "ᛜᚴ", "ᚺᚹ", "ᛋ", "ᛟᛖ", "ᚭᚭ", "ᚴ", NULL};
+const TokenPair younger_futhark_pairs[] = {
+    {"a", "ᛅ"},   {"b", "ᛒ"},   {"c", "ᚴ"},  {"d", "ᛏ"},   {"e", "ᛁ"},
+    {"f", "ᚠ"},   {"g", "ᚴ"},   {"h", "ᚼ"},  {"i", "ᛁ"},   {"j", "ᛡ"},
+    {"k", "ᚴ"},   {"l", "ᛚ"},   {"m", "ᛘ"},  {"n", "ᚾ"},   {"o", "ᚬ"},
+    {"p", "ᛒ"},   {"r", "ᚱ"},   {"s", "ᛋ"},  {"t", "ᛏ"},   {"u", "ᚢ"},
+    {"v", "ᚢ"},   {"w", "ᚢ"},   {"y", "ᛡ"},  {"z", "ᛋ"},   {"æ", "ᛅ"},
+    {"þ", "ᚦ"},   {"ð", "ᚦ"},   {"ŋ", "ᚴ"},  {"x", "ᚴᛋ"},  {"ch", "ᚴ"},
+    {"ij", "ᛁ"},  {"cc", "ᚴᛋ"}, {"th", "ᚦ"}, {"eau", "ᚬ"}, {"chr", "ᚼ/ᚽ"},
+    {"ing", "ᚴ"}, {"chl", "ᚼ"}, {"ng", "ᚴ"}, {"chj", "ᚼ"}, {"nk", "ᚴ"},
+    {"chw", "ᚼ"}, {"ei", "ᛁ"},  {"ø", "ᚬ"},  {"å", "ᚭᚭ"},  {"q", "ᚴ"},
+    {"ʀ", "ᛦ"},   {NULL, NULL}};
 
-TokenMapper *token_mapper_elder_new() {
-  GHashTable *token_map;
-
-  token_map = g_hash_table_new(g_str_hash, g_str_equal);
+TokenMapper *token_mapper_new(const TokenPair *pairs) {
+  GHashTable *token_map = g_hash_table_new(g_str_hash, g_str_equal);
   if (!token_map) {
     return NULL;
   }
 
-  for (int i = 0; latin_tokens[i] != NULL; i++) {
-    g_hash_table_insert(token_map, (gpointer)latin_tokens[i],
-                        (gpointer)elder_futhark_tokens[i]);
+  for (int i = 0; pairs[i].latin != NULL; i++) {
+    g_hash_table_insert(token_map, (gpointer)pairs[i].latin,
+                        (gpointer)pairs[i].futhark);
   }
 
   TokenMapper *token_mapper = malloc(sizeof(TokenMapper));
   if (!token_mapper) {
-    // Handle error if memory allocation fails
     g_hash_table_destroy(token_map);
     return NULL;
   }
   token_mapper->map = token_map;
   return token_mapper;
+}
+
+TokenMapper *token_mapper_elder_new() {
+  return token_mapper_new(elder_futhark_pairs);
 }
 
 TokenMapper *token_mapper_younger_new() {
-  GHashTable *token_map;
-
-  token_map = g_hash_table_new(g_str_hash, g_str_equal);
-  if (!token_map) {
-    return NULL;
-  }
-
-  for (int i = 0; latin_tokens[i] != NULL; i++) {
-    g_hash_table_insert(token_map, (gpointer)latin_tokens[i],
-                        (gpointer)younger_futhark_tokens[i]);
-  }
-
-  TokenMapper *token_mapper = malloc(sizeof(TokenMapper));
-  if (!token_mapper) {
-    // Handle error if memory allocation fails
-    g_hash_table_destroy(token_map);
-    return NULL;
-  }
-  token_mapper->map = token_map;
-  return token_mapper;
+  return token_mapper_new(younger_futhark_pairs);
 }
 
-/* This function is used to transliterate a string from Latin characters to
- * Elder Futhark characters. */
-char *to_fut(TokenMapper *map, char *input) {
-  size_t len = strlen(input);
-  char *fut_str = malloc((len * 4) + 1); // 4 because of utf8 expansion
-  if (!fut_str) {
-    perror("Error allocating memory for output string");
-    return NULL;
+void replace_string(char *str, const char *search, const char *replace) {
+  char *pos;
+  int search_len = strlen(search);
+  int replace_len = strlen(replace);
+
+  pos = strstr(str, search);
+
+  while (pos != NULL) {
+    memmove(pos + replace_len, pos + search_len, strlen(pos + search_len) + 1);
+    memcpy(pos, replace, replace_len);
+    pos = strstr(pos + replace_len, search);
   }
-  fut_str[0] = '\0';
+}
 
-  char *p = input;
-  int token_index = 0;
-  char *token = malloc(len + 1);
-  if (!token) {
-    perror("Error allocating memory for token");
-    return NULL;
+char *replace_in_string_with(const char *input, const char *search,
+                             const char *replace) {
+  char *output = malloc(strlen(input) * 4);
+
+  strcpy(output, input);
+  replace_string(output, search, replace);
+
+  return output;
+}
+
+typedef struct KVP {
+  const char *key;
+  const char *value;
+} KVP;
+
+static int compare_strings_by_length(const void *a, const void *b) {
+  // convert to kvp
+  KVP *kvp_a = (KVP *)a;
+  KVP *kvp_b = (KVP *)a;
+  return strlen(kvp_a->key) - strlen(kvp_b->key);
+}
+
+char *to_fut(TokenMapper *map, const char *input) {
+  char *output = malloc(strlen(input) * 4);
+  strcpy(output, input);
+
+  KVP *kvps = malloc(sizeof(KVP) * g_hash_table_size(map->map));
+  size_t kvp_count = 0;
+
+  // create an ordered list of the key value pairs that makes sure the longest
+  // keys are first
+  GHashTableIter iter;
+  gpointer key, value;
+  g_hash_table_iter_init(&iter, map->map);
+  while (g_hash_table_iter_next(&iter, &key, &value)) {
+    kvps[kvp_count].key = (const char *)key;
+    kvps[kvp_count].value = (const char *)value;
+    kvp_count++;
   }
 
-  do {
-    if (*p == ' ') {
-      strcat(fut_str, " ");
-      token[0] = '\0';
-      token_index = 0;
-      p++;
-      continue;
-    }
+  //sort kvp longest to shortest keys
+  qsort(kvps, kvp_count, sizeof(KVP), compare_strings_by_length);
 
-    char c = tolower(*p);
-    token[token_index] = c;
-    token[token_index + 1] = '\0';
+  while (kvp_count--) {
+    output = replace_in_string_with(output, kvps[kvp_count].key,
+                                    kvps[kvp_count].value);
+  }
 
-    // if the char is not in the map at all, we dump it and
-    // just use the char that is there
-    if (!g_hash_table_contains(map->map, token)) {
-      strcat(fut_str, token);
-      token[0] = '\0';
-      token_index = 0;
-      p++;
-      continue;
-    }
+  free(kvps);
 
-    p++;
-    token_index++;
-
-    // token next is the token plus one extra char
-    char *token_next = malloc(len + 1);
-    strcpy(token_next, token);
-    token_next[token_index] = tolower(*p);
-    token_next[token_index + 1] = '\0';
-
-    if ((g_hash_table_contains(map->map, token) &&
-         !g_hash_table_contains(map->map, token_next)) ||
-        // if the token and next token are the same, we have hit the end of the
-        // input string
-        (strcmp(token, token_next) == 0)) {
-      char *futhark = g_hash_table_lookup(map->map, token);
-      strcat(fut_str, futhark);
-      token[token_index] = '\0';
-      token[0] = '\0';
-      token_index = 0;
-    }
-  } while (*p != '\0');
-  
-  free(token);
-  return fut_str;
+  return output;
 }

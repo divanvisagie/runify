@@ -1,3 +1,23 @@
+# Configuration for clang-format
 
+# Add include directories
 CompileFlags:
   Add: [-Isrc, -I/usr/include/glib-2.0, -I/usr/lib/x86_64-linux-gnu/glib-2.0/include]
+
+# Set tab width to 4 spaces
+TabWidth: 4
+
+# Disable formatting for specific sections
+# Use these comments in your code to disable formatting:
+#   // clang-format off
+#   // clang-format on
+
+# Set other formatting options
+BasedOnStyle: LLVM
+IndentWidth: 4
+ContinuationIndentWidth: 4
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBraces: Allman
+ColumnLimit: 80
+
