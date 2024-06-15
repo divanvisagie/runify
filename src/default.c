@@ -77,16 +77,6 @@ void replace_string(char *str, const char *search, const char *replace) {
   }
 }
 
-char *replace_in_string_with(const char *input, const char *search,
-                             const char *replace) {
-  char *output = malloc(strlen(input) * 4);
-
-  strcpy(output, input);
-  replace_string(output, search, replace);
-
-  return output;
-}
-
 typedef struct KVP {
   const char *key;
   const char *value;
@@ -126,8 +116,7 @@ char *to_fut(TokenMapper *map, const char *input) {
   qsort(kvps, kvp_count, sizeof(KVP), compare_strings_by_length);
 
   while (kvp_count--) {
-    output = replace_in_string_with(output, kvps[kvp_count].key,
-                                    kvps[kvp_count].value);
+    replace_string(output, kvps[kvp_count].key, kvps[kvp_count].value);
   }
 
   free(kvps);

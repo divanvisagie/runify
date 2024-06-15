@@ -70,12 +70,6 @@ static void test_test_full_elder_futhark(void **state) {
 
 }
 
-static void test_string_replacer(void **state) {
-  char* actual = replace_in_string_with("futhark", "f", "M");
-  assert_string_equal("Muthark", actual);
-  free(actual);
-}
-
 // Group all test cases together
 int main(int argc, char *argv[]) {
   const struct CMUnitTest tests[] = {
@@ -84,7 +78,6 @@ int main(int argc, char *argv[]) {
       cmocka_unit_test(test_non_supported_token),
       cmocka_unit_test(test_to_elder_futhark),
       cmocka_unit_test(test_test_full_elder_futhark),
-      cmocka_unit_test(test_string_replacer),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }
