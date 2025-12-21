@@ -52,6 +52,11 @@ int main(int argc, char **argv) {
     return 0;
   }
 
+  if (args->error) {
+    fprintf(stderr, "Error: %s\n", args->error);
+    return 1;
+  }
+
   size_t buffer_size = INITIAL_BUFFER_SIZE;
   char *all_input = malloc(buffer_size);
   if (!all_input) {

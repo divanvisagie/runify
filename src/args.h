@@ -7,6 +7,8 @@ typedef struct {
   bool reverse;
   bool phonetic;
   char* system;
+  char* error;
 } Args;
 
 Args* parse_args(int argc, char **argv);
+bool is_valid_system(const char* system);
