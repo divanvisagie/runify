@@ -70,6 +70,54 @@ static void test_test_full_elder_futhark(void **state) {
 
 }
 
+// Test reverse translation (runes to Latin)
+// Note: reverse mapping uses first Latin char for each rune
+// (ᚦ→þ not th, ᚲ→c not k, since "c" appears before "k" in pairs)
+static void test_from_elder_futhark(void **state) {
+  TokenMapper* tokenMapper = token_mapper_elder_new();
+  assert_non_null(tokenMapper);
+
+  char* actual = from_fut(tokenMapper, "ᚺᛖᛚᛚᛟ");
+  assert_string_equal("hello", actual);
+
+  // ᚠᚢᚦᚨᚱᚲ reverses to "fuþarc" (þ not th, c not k)
+  char* actual2 = from_fut(tokenMapper, "ᚠᚢᚦᚨᚱᚲ");
+  assert_string_equal("fuþarc", actual2);
+}
+
+// Test reverse translation with Younger Futhark
+// Note: in Younger Futhark, both 'e' and 'i' map to ᛁ
+// Reverse picks 'e' since it appears first in the pairs
+static void test_from_younger_futhark(void **state) {
+  TokenMapper* tokenMapper = token_mapper_younger_new();
+  assert_non_null(tokenMapper);
+
+  // ᛅᛁᚠᚢᚱ reverses to "aefur" (ᛁ→e since e appears before i)
+  char* actual = from_fut(tokenMapper, "ᛅᛁᚠᚢᚱ");
+  assert_string_equal("aefur", actual);
+}
+
+// Test basic (non-phonetic) mapper
+static void test_elder_basic_no_phonetic(void **state) {
+  TokenMapper* tokenMapper = token_mapper_elder_basic_new();
+  assert_non_null(tokenMapper);
+
+  // With basic mapper, "th" should become ᛏᚺ (two runes), not ᚦ (one rune)
+  char* actual = to_fut(tokenMapper, "th");
+  assert_string_equal("ᛏᚺ", actual);
+}
+
+// Test roundtrip (Latin -> Runes -> Latin)
+static void test_roundtrip_elder(void **state) {
+  TokenMapper* tokenMapper = token_mapper_elder_new();
+  assert_non_null(tokenMapper);
+
+  // Simple words should roundtrip
+  char* runes = to_fut(tokenMapper, "hello");
+  char* back = from_fut(tokenMapper, runes);
+  assert_string_equal("hello", back);
+}
+
 // Group all test cases together
 int main(int argc, char *argv[]) {
   const struct CMUnitTest tests[] = {
@@ -78,6 +126,10 @@ int main(int argc, char *argv[]) {
       cmocka_unit_test(test_non_supported_token),
       cmocka_unit_test(test_to_elder_futhark),
       cmocka_unit_test(test_test_full_elder_futhark),
+      cmocka_unit_test(test_from_elder_futhark),
+      cmocka_unit_test(test_from_younger_futhark),
+      cmocka_unit_test(test_elder_basic_no_phonetic),
+      cmocka_unit_test(test_roundtrip_elder),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

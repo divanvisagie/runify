@@ -1,7 +1,11 @@
+#define RUNIFY_VERSION "1.0.0"
 
 typedef struct {
   bool help;
   bool list;
+  bool version;
+  bool reverse;
+  bool phonetic;
   char* system;
 } Args;
 

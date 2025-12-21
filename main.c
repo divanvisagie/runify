@@ -9,18 +9,21 @@
 #define INITIAL_BUFFER_SIZE 1024
 
 char *get_help() {
-  char *help = "Usage: runify [OPTION]... [STRING]\n"
-               "Transliterate a string from Latin characters to Elder Futhark "
-               "characters.\n"
+  char *help = "Usage: runify [OPTION]...\n"
+               "Transliterate Latin text to Futhark runes.\n"
                "\n"
                "Options:\n"
                "  -h, --help              Display this help and exit\n"
+               "  -v, --version           Display version and exit\n"
                "  -l, --list              List rune systems\n"
-               "  -s, --system=SYSTEM\n   Specify rune system to use\n"
+               "  -s, --system=SYSTEM     Specify rune system (elder, younger)\n"
+               "  -p, --phonetic          Enable phonetic mode (default)\n"
+               "      --no-phonetic       Disable phonetic mode\n"
                "\n"
                "Examples:\n"
-               "  runify hello world\n"
-               "  runify -h\n";
+               "  echo 'hello' | runify -s elder           # ᚺᛖᛚᛚᛟ\n"
+               "  echo 'thing' | runify -s elder           # ᚦᛁᛜ (phonetic)\n"
+               "  echo 'thing' | runify --no-phonetic      # ᛏᚺᛁᛜ\n";
   return help;
 }
 
@@ -35,6 +38,11 @@ int main(int argc, char **argv) {
   if (args->help) {
     char *help = get_help();
     printf("%s\n", help);
+    return 0;
+  }
+
+  if (args->version) {
+    printf("runify %s\n", RUNIFY_VERSION);
     return 0;
   }
 
@@ -72,10 +80,14 @@ int main(int argc, char **argv) {
   }
 
   free(line);
-  // Select the rune system
-  TokenMapper *mapper = token_mapper_elder_new();
-  if (strcmp(args->system, "younger") == 0) {
-    mapper = token_mapper_younger_new();
+
+  // Select the rune system based on system and phonetic flags
+  TokenMapper *mapper = NULL;
+  if (strcmp(args->system, "elder") == 0) {
+    mapper = args->phonetic ? token_mapper_elder_new() : token_mapper_elder_basic_new();
+  } else {
+    // Default to younger
+    mapper = args->phonetic ? token_mapper_younger_new() : token_mapper_younger_basic_new();
   }
 
   // Map and transliterate input
@@ -85,7 +97,12 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  char *output = to_fut(mapper, all_input);
+  char *output;
+  if (args->reverse) {
+    output = from_fut(mapper, all_input);
+  } else {
+    output = to_fut(mapper, all_input);
+  }
 
   if (!output) {
     fprintf(stderr, "Error transliterating input\n");
