@@ -4,10 +4,7 @@
 #include <string.h>
 
 #include "args.h"
-
-bool is_valid_system(const char* system) {
-  return strcmp(system, "elder") == 0 || strcmp(system, "younger") == 0;
-}
+#include "futharks/futhark.h"
 
 Args* parse_args(int argc, char **argv) {
   Args *args = malloc(sizeof(Args));
@@ -50,10 +47,11 @@ Args* parse_args(int argc, char **argv) {
     }
   }
 
-  // Validate system parameter
-  if (!is_valid_system(args->system)) {
+  // Validate system parameter using the registry
+  // Note: registry must be initialized before calling parse_args
+  if (!futhark_registry_is_valid(args->system)) {
     args->error = malloc(256);
-    snprintf(args->error, 256, "Unknown rune system: '%s'. Use 'elder' or 'younger'.", args->system);
+    snprintf(args->error, 256, "Unknown rune system: '%s'. Use -l to list available systems.", args->system);
   }
 
   return args;

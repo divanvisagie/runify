@@ -7,7 +7,7 @@ SRC_DIR = src
 RELEASE_DIR = ./release
 
 # Common flags
-CFLAGS = -I$(SRC_DIR) -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/cmocka
+CFLAGS = -I$(SRC_DIR) -I. -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/cmocka
 LDFLAGS = -lglib-2.0 -lcmocka
 
 # Platform-specific flags
@@ -20,8 +20,8 @@ endif
 # Define platform and architecture
 ARCH ?= $(shell uname -m | tr '[:upper:]' '[:lower:]')
 
-# Find all C source files in the source directory
-SOURCES := $(wildcard $(SRC_DIR)/*.c)
+# Find all C source files in the source directory and subdirectories
+SOURCES := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/futharks/*.c)
 # Exclude certain source files
 EXCLUDES := $(SRC_DIR)/main.c
 SOURCES := $(filter-out $(EXCLUDES), $(SOURCES))

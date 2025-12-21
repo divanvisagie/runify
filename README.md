@@ -63,6 +63,19 @@ Then simply
 brew install runify
 ```
 
+# Sources
+
+Transliteration mappings reference scholarly and academic sources:
+
+- [Uppsala University Runic Forum (SRDB)](https://www.runforum.nordiska.uu.se/en/srd/)
+- [Scandinavian Runic-text Database (Uppsala University)](https://www.uu.se/en/department/scandinavian-languages/research/research-projects/scandinavian-runic-text-database)
+- [Futhark Journal Style Sheet](https://futhark-journal.com/authors/style-sheet/)
+- [The Rune Cast Podcast (Uppsala University)](https://www.runforum.nordiska.uu.se/runecast/episode-1/)
+- [dCode Elder Futhark](https://www.dcode.fr/elder-futhark)
+- [Omniglot Runic Alphabets](https://www.omniglot.com/writing/runic.htm)
+- [Wikipedia: Elder Futhark](https://en.wikipedia.org/wiki/Elder_Futhark)
+- [Wikipedia: Runic Transliteration](https://en.wikipedia.org/wiki/Runic_transliteration_and_transcription)
+
 # Rune mappings
 
 | Latin Character | Elder Futhark       | Younger Futhark                   |
@@ -115,4 +128,3 @@ brew install runify
 | å               | ᚨᚨ                  | ᚭᚭ (å)                            |
 | q               | ᚲ                   | ᚴ (q)                             |
 | ʀ               |                     | ᛦ (ʀ)                             |
-

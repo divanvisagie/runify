@@ -1,3 +1,8 @@
+#ifndef ARGS_H
+#define ARGS_H
+
+#include <stdbool.h>
+
 #define RUNIFY_VERSION "1.0.0"
 
 typedef struct {
@@ -11,4 +16,5 @@ typedef struct {
 } Args;
 
 Args* parse_args(int argc, char **argv);
-bool is_valid_system(const char* system);
+
+#endif // ARGS_H

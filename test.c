@@ -1,6 +1,4 @@
 #include <stdio.h>
-// Including setjmp.h because it's required indirectly by CMocka for certain
-// macros/longjmp operations.
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdarg.h>
@@ -8,128 +6,271 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "default.h"
+#include "src/futharks/futhark.h"
 
-static void test_to_elder_futhark(void **state) {
-  TokenMapper* tokenMapper = token_mapper_elder_new();
-  assert_non_null(tokenMapper);
-  char* actual = to_fut(tokenMapper, "futhark");
-  assert_string_equal("ᚠᚢᚦᚨᚱᚲ", actual);
-
-  char* actual2 = to_fut(tokenMapper, "hello world");
-  assert_string_equal("ᚺᛖᛚᛚᛟ ᚹᛟᚱᛚᛞ", actual2);
-  
+// Helper to get phonetic (combined) mapper
+static TokenMapper* token_mapper_elder_new(void) {
+  return token_mapper_for_system("elder", true);
 }
 
-static void test_non_supported_token(void **state) {
-  TokenMapper* tokenMapper = token_mapper_elder_new();
-  assert_non_null(tokenMapper);
-  char* actual = to_fut(tokenMapper, "futhark!\n");
-  assert_string_equal("ᚠᚢᚦᚨᚱᚲ!\n", actual);
-  
+static TokenMapper* token_mapper_younger_new(void) {
+  return token_mapper_for_system("younger", true);
 }
 
-static void test_to_younger_futhark(void **state) {
-  TokenMapper* tokenMapper = token_mapper_younger_new();
-  assert_non_null(tokenMapper);
-  char* actual = to_fut(tokenMapper, "aifur");
-  assert_string_equal("ᛅᛁᚠᚢᚱ", actual);
-  
-  // free(tokenMapper);
+static TokenMapper* token_mapper_elder_basic_new(void) {
+  return token_mapper_for_system("elder", false);
 }
 
-static void test_map_loaded_correctly(void **state) {
-  TokenMapper* tokenMapper = token_mapper_elder_new();
-  assert_non_null(tokenMapper);
-  
-  assert_non_null(tokenMapper->map);
-  char* actual = g_hash_table_lookup(tokenMapper->map, "f");
-  assert_string_equal("ᚠ", actual);
-
-  // free(tokenMapper);
+static TokenMapper* token_mapper_younger_basic_new(void) {
+  return token_mapper_for_system("younger", false);
 }
 
-// [ᚠ]	ᚢ	ᚦ	ᚨ	ᚱ	ᚲ	ᚷ	[ᚹ]	ᚺ	ᚾ	ᛁ	ᛃ	ᛈ	ᛇ	ᛉ	ᛊ	ᛏ	ᛒ	ᛖ	ᛗ	ᛚ	ᛜ	ᛞ	ᛟ
-// [f]	u	þ	a	r	k	g	[w]	h	n	i	j	p	ï	z	s	t	b	e	m	l	ŋ	d	o
-static void test_test_full_elder_futhark(void **state) {
-  TokenMapper* tokenMapper = token_mapper_elder_new();
-  assert_non_null(tokenMapper);
+// =============================================================================
+// Elder Futhark Basic Tests (30 mappings)
+// =============================================================================
 
-  char* full_futhark_latin[] = {
-    "f", "u", "th", "a", "r", "k" , "g"
+static void test_elder_basic_all_mappings(void **state) {
+  TokenMapper* mapper = token_mapper_elder_basic_new();
+  assert_non_null(mapper);
+
+  // All 30 basic Elder Futhark mappings
+  const char* latin[] = {
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+    "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
+    "v", "w", "y", "z", "q", "æ", "þ", "ð", "ŋ", "ï"
+  };
+  const char* runes[] = {
+    "ᚨ", "ᛒ", "ᚲ", "ᛞ", "ᛖ", "ᚠ", "ᚷ", "ᚺ", "ᛁ", "ᛃ",
+    "ᚲ", "ᛚ", "ᛗ", "ᚾ", "ᛟ", "ᛈ", "ᚱ", "ᛋ", "ᛏ", "ᚢ",
+    "ᚠ", "ᚹ", "ᛃ", "ᛉ", "ᚲ", "ᛇ", "ᚦ", "ᚦ", "ᛜ", "ᛇ"
   };
 
-  char* full_futhark[] = {
-    "ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ"
-  };
-
-  for (int i = 0; i < 3; i++) {
-    char* actual = to_fut(tokenMapper, full_futhark_latin[i]);
-    assert_string_equal(full_futhark[i], actual);
+  for (int i = 0; i < 30; i++) {
+    char* actual = to_fut(mapper, latin[i]);
+    assert_string_equal(runes[i], actual);
+    free(actual);
   }
 
+  token_mapper_free(mapper);
 }
 
-// Test reverse translation (runes to Latin)
-// Note: reverse mapping uses first Latin char for each rune
-// (ᚦ→þ not th, ᚲ→c not k, since "c" appears before "k" in pairs)
-static void test_from_elder_futhark(void **state) {
-  TokenMapper* tokenMapper = token_mapper_elder_new();
-  assert_non_null(tokenMapper);
+// =============================================================================
+// Elder Futhark Phonetic Tests (16 mappings)
+// =============================================================================
 
-  char* actual = from_fut(tokenMapper, "ᚺᛖᛚᛚᛟ");
-  assert_string_equal("hello", actual);
+static void test_elder_phonetic_all_mappings(void **state) {
+  TokenMapper* mapper = token_mapper_elder_new();
+  assert_non_null(mapper);
 
-  // ᚠᚢᚦᚨᚱᚲ reverses to "fuþarc" (þ not th, c not k)
-  char* actual2 = from_fut(tokenMapper, "ᚠᚢᚦᚨᚱᚲ");
-  assert_string_equal("fuþarc", actual2);
-}
-
-// Test reverse translation with Younger Futhark
-// Note: in Younger Futhark, both 'e' and 'i' map to ᛁ
-// Reverse picks 'e' since it appears first in the pairs
-static void test_from_younger_futhark(void **state) {
-  TokenMapper* tokenMapper = token_mapper_younger_new();
-  assert_non_null(tokenMapper);
-
-  // ᛅᛁᚠᚢᚱ reverses to "aefur" (ᛁ→e since e appears before i)
-  char* actual = from_fut(tokenMapper, "ᛅᛁᚠᚢᚱ");
-  assert_string_equal("aefur", actual);
-}
-
-// Test basic (non-phonetic) mapper
-static void test_elder_basic_no_phonetic(void **state) {
-  TokenMapper* tokenMapper = token_mapper_elder_basic_new();
-  assert_non_null(tokenMapper);
-
-  // With basic mapper, "th" should become ᛏᚺ (two runes), not ᚦ (one rune)
-  char* actual = to_fut(tokenMapper, "th");
-  assert_string_equal("ᛏᚺ", actual);
-}
-
-// Test roundtrip (Latin -> Runes -> Latin)
-static void test_roundtrip_elder(void **state) {
-  TokenMapper* tokenMapper = token_mapper_elder_new();
-  assert_non_null(tokenMapper);
-
-  // Simple words should roundtrip
-  char* runes = to_fut(tokenMapper, "hello");
-  char* back = from_fut(tokenMapper, runes);
-  assert_string_equal("hello", back);
-}
-
-// Group all test cases together
-int main(int argc, char *argv[]) {
-  const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_map_loaded_correctly),
-      cmocka_unit_test(test_to_younger_futhark),
-      cmocka_unit_test(test_non_supported_token),
-      cmocka_unit_test(test_to_elder_futhark),
-      cmocka_unit_test(test_test_full_elder_futhark),
-      cmocka_unit_test(test_from_elder_futhark),
-      cmocka_unit_test(test_from_younger_futhark),
-      cmocka_unit_test(test_elder_basic_no_phonetic),
-      cmocka_unit_test(test_roundtrip_elder),
+  // All 16 phonetic Elder Futhark mappings
+  const char* latin[] = {
+    "th", "ng", "ing", "nk",
+    "ch", "chr", "chl", "chj",
+    "chw", "x", "cc", "ij",
+    "ei", "eau", "ø", "å"
   };
+  const char* runes[] = {
+    "ᚦ", "ᛜ", "ᛜ", "ᛜᚲ",
+    "ᚷ", "ᚺᚱ", "ᚺᛚ", "ᚺᛃ",
+    "ᚺᚹ", "ᚲᛋ", "ᚲᛋ", "ᛖ",
+    "ᛋ", "ᛟ", "ᛟᛖ", "ᚨᚨ"
+  };
+
+  for (int i = 0; i < 16; i++) {
+    char* actual = to_fut(mapper, latin[i]);
+    assert_string_equal(runes[i], actual);
+    free(actual);
+  }
+
+  token_mapper_free(mapper);
+}
+
+// =============================================================================
+// Younger Futhark Basic Tests (30 mappings)
+// =============================================================================
+
+static void test_younger_basic_all_mappings(void **state) {
+  TokenMapper* mapper = token_mapper_younger_basic_new();
+  assert_non_null(mapper);
+
+  // All 30 basic Younger Futhark mappings
+  const char* latin[] = {
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+    "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
+    "v", "w", "y", "z", "q", "æ", "þ", "ð", "ŋ", "ʀ"
+  };
+  const char* runes[] = {
+    "ᛅ", "ᛒ", "ᚴ", "ᛏ", "ᛁ", "ᚠ", "ᚴ", "ᚼ", "ᛁ", "ᛡ",
+    "ᚴ", "ᛚ", "ᛘ", "ᚾ", "ᚬ", "ᛒ", "ᚱ", "ᛋ", "ᛏ", "ᚢ",
+    "ᚢ", "ᚢ", "ᛡ", "ᛋ", "ᚴ", "ᛅ", "ᚦ", "ᚦ", "ᚴ", "ᛦ"
+  };
+
+  for (int i = 0; i < 30; i++) {
+    char* actual = to_fut(mapper, latin[i]);
+    assert_string_equal(runes[i], actual);
+    free(actual);
+  }
+
+  token_mapper_free(mapper);
+}
+
+// =============================================================================
+// Younger Futhark Phonetic Tests (16 mappings)
+// =============================================================================
+
+static void test_younger_phonetic_all_mappings(void **state) {
+  TokenMapper* mapper = token_mapper_younger_new();
+  assert_non_null(mapper);
+
+  // All 16 phonetic Younger Futhark mappings
+  const char* latin[] = {
+    "th", "ng", "ing", "nk",
+    "ch", "chr", "chl", "chj",
+    "chw", "x", "cc", "ij",
+    "ei", "eau", "ø", "å"
+  };
+  const char* runes[] = {
+    "ᚦ", "ᚴ", "ᚴ", "ᚴ",
+    "ᚴ", "ᚼ", "ᚼ", "ᚼ",
+    "ᚼ", "ᚴᛋ", "ᚴᛋ", "ᛁ",
+    "ᛁ", "ᚬ", "ᚬ", "ᚭᚭ"
+  };
+
+  for (int i = 0; i < 16; i++) {
+    char* actual = to_fut(mapper, latin[i]);
+    assert_string_equal(runes[i], actual);
+    free(actual);
+  }
+
+  token_mapper_free(mapper);
+}
+
+// =============================================================================
+// Integration / Word Tests
+// =============================================================================
+
+static void test_elder_word_futhark(void **state) {
+  TokenMapper* mapper = token_mapper_elder_new();
+  assert_non_null(mapper);
+
+  char* actual = to_fut(mapper, "futhark");
+  assert_string_equal("ᚠᚢᚦᚨᚱᚲ", actual);
+  free(actual);
+
+  token_mapper_free(mapper);
+}
+
+static void test_elder_word_hello_world(void **state) {
+  TokenMapper* mapper = token_mapper_elder_new();
+  assert_non_null(mapper);
+
+  char* actual = to_fut(mapper, "hello world");
+  assert_string_equal("ᚺᛖᛚᛚᛟ ᚹᛟᚱᛚᛞ", actual);
+  free(actual);
+
+  token_mapper_free(mapper);
+}
+
+static void test_younger_word_aifur(void **state) {
+  TokenMapper* mapper = token_mapper_younger_new();
+  assert_non_null(mapper);
+
+  char* actual = to_fut(mapper, "aifur");
+  assert_string_equal("ᛅᛁᚠᚢᚱ", actual);
+  free(actual);
+
+  token_mapper_free(mapper);
+}
+
+static void test_non_supported_tokens_preserved(void **state) {
+  TokenMapper* mapper = token_mapper_elder_new();
+  assert_non_null(mapper);
+
+  char* actual = to_fut(mapper, "futhark!\n");
+  assert_string_equal("ᚠᚢᚦᚨᚱᚲ!\n", actual);
+  free(actual);
+
+  token_mapper_free(mapper);
+}
+
+// =============================================================================
+// Phonetic vs Non-Phonetic Mode Tests
+// =============================================================================
+
+static void test_elder_phonetic_th_combined(void **state) {
+  TokenMapper* mapper = token_mapper_elder_new();
+  assert_non_null(mapper);
+
+  // Phonetic mode: "th" becomes single rune ᚦ
+  char* actual = to_fut(mapper, "th");
+  assert_string_equal("ᚦ", actual);
+  free(actual);
+
+  token_mapper_free(mapper);
+}
+
+static void test_elder_basic_th_separate(void **state) {
+  TokenMapper* mapper = token_mapper_elder_basic_new();
+  assert_non_null(mapper);
+
+  // Non-phonetic mode: "th" becomes two runes ᛏᚺ
+  char* actual = to_fut(mapper, "th");
+  assert_string_equal("ᛏᚺ", actual);
+  free(actual);
+
+  token_mapper_free(mapper);
+}
+
+static void test_younger_phonetic_ng_combined(void **state) {
+  TokenMapper* mapper = token_mapper_younger_new();
+  assert_non_null(mapper);
+
+  // Phonetic mode: "ng" becomes ᚴ
+  char* actual = to_fut(mapper, "ng");
+  assert_string_equal("ᚴ", actual);
+  free(actual);
+
+  token_mapper_free(mapper);
+}
+
+static void test_younger_basic_ng_separate(void **state) {
+  TokenMapper* mapper = token_mapper_younger_basic_new();
+  assert_non_null(mapper);
+
+  // Non-phonetic mode: "ng" becomes two runes ᚾᚴ
+  char* actual = to_fut(mapper, "ng");
+  assert_string_equal("ᚾᚴ", actual);
+  free(actual);
+
+  token_mapper_free(mapper);
+}
+
+// =============================================================================
+// Main
+// =============================================================================
+
+int main(int argc, char *argv[]) {
+  futhark_registry_init();
+
+  const struct CMUnitTest tests[] = {
+      // Full coverage tests
+      cmocka_unit_test(test_elder_basic_all_mappings),
+      cmocka_unit_test(test_elder_phonetic_all_mappings),
+      cmocka_unit_test(test_younger_basic_all_mappings),
+      cmocka_unit_test(test_younger_phonetic_all_mappings),
+
+      // Word integration tests
+      cmocka_unit_test(test_elder_word_futhark),
+      cmocka_unit_test(test_elder_word_hello_world),
+      cmocka_unit_test(test_younger_word_aifur),
+      cmocka_unit_test(test_non_supported_tokens_preserved),
+
+      // Phonetic vs non-phonetic mode
+      cmocka_unit_test(test_elder_phonetic_th_combined),
+      cmocka_unit_test(test_elder_basic_th_separate),
+      cmocka_unit_test(test_younger_phonetic_ng_combined),
+      cmocka_unit_test(test_younger_basic_ng_separate),
+  };
+
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

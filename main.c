@@ -3,10 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "args.h"
-#include "default.h"
+#include "src/args.h"
+#include "src/futharks/futhark.h"
 
 #define INITIAL_BUFFER_SIZE 1024
+
+// Callback for listing futhark systems
+static void print_system(const FutharkSystem *system, void *userdata) {
+  (void)userdata;
+  printf("%-8s %s\n", system->name, system->display_name);
+}
 
 char *get_help() {
   char *help = "Usage: runify [OPTION]...\n"
@@ -27,13 +33,10 @@ char *get_help() {
   return help;
 }
 
-char *list_rune_systems() {
-  char *systems = "elder:   Elder Futhark\n"
-                  "younger: Younger Futhark\n";
-  return systems;
-}
-
 int main(int argc, char **argv) {
+  // Initialize the futhark registry
+  futhark_registry_init();
+
   Args *args = parse_args(argc, argv);
   if (args->help) {
     char *help = get_help();
@@ -47,8 +50,7 @@ int main(int argc, char **argv) {
   }
 
   if (args->list) {
-    char *systems = list_rune_systems();
-    printf("%s\n", systems);
+    futhark_registry_list(print_system, NULL);
     return 0;
   }
 
@@ -86,18 +88,11 @@ int main(int argc, char **argv) {
 
   free(line);
 
-  // Select the rune system based on system and phonetic flags
-  TokenMapper *mapper = NULL;
-  if (strcmp(args->system, "elder") == 0) {
-    mapper = args->phonetic ? token_mapper_elder_new() : token_mapper_elder_basic_new();
-  } else {
-    // Default to younger
-    mapper = args->phonetic ? token_mapper_younger_new() : token_mapper_younger_basic_new();
-  }
+  // Get token mapper for the specified system
+  TokenMapper *mapper = token_mapper_for_system(args->system, args->phonetic);
 
-  // Map and transliterate input
   if (!mapper) {
-    fprintf(stderr, "Error creating TokenMapper\n");
+    fprintf(stderr, "Error creating TokenMapper for system '%s'\n", args->system);
     free(all_input);
     return 1;
   }
@@ -112,14 +107,14 @@ int main(int argc, char **argv) {
   if (!output) {
     fprintf(stderr, "Error transliterating input\n");
     free(all_input);
-    free(mapper);
+    token_mapper_free(mapper);
     return 1;
   }
 
   // Print and free resources
   printf("%s", output);
   free(output);
-  free(mapper);
+  token_mapper_free(mapper);
   free(all_input);
 
   return 0;
