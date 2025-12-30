@@ -1,4 +1,4 @@
-.PHONY: main clean
+.PHONY: main clean install uninstall
 
 BIN_NAME = runify
 CC = gcc
@@ -45,6 +45,12 @@ test:
 clean:
 	rm -f bin/$(BIN_NAME)
 	rm -f bin/test
+
+install: build
+	@sh ./scripts/install.sh
+
+uninstall:
+	@sh ./scripts/uninstall.sh
 
 deb: build
 	@sh ./scripts/build_deb.sh
